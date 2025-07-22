@@ -8,6 +8,7 @@ public class AudioObject : MonoBehaviour
 {
     [GetComponent] private AudioSource selfAudioSource;
 
+    public AudioSource AudioSource { get { return selfAudioSource; } }
     private void Awake()
     {
         this.InitializeDependencies();
@@ -25,7 +26,17 @@ public class AudioObject : MonoBehaviour
         selfAudioSource.Play();
         StartCoroutine(StopSoundEffect(audioClip));
     }
-
+    public void PlaySoundEffectOnLoop(AudioClip audioClip, AudioMixerGroup audioMixerGroup, Vector3 position, float volume)
+    {
+        selfAudioSource.Stop();
+        selfAudioSource.clip = audioClip;
+        transform.position = position;
+        selfAudioSource.volume = volume;
+        selfAudioSource.outputAudioMixerGroup = audioMixerGroup;
+        selfAudioSource.loop = true;
+        selfAudioSource.Play();
+        //   StartCoroutine(StopSoundEffect(audioClip));
+    }
     private IEnumerator StopSoundEffect(AudioClip audioClip)
     {
         yield return new WaitForSeconds(audioClip.length);
