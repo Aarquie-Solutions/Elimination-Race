@@ -24,18 +24,16 @@ namespace ZombieElimination
         }
 
 
-        public float radius = 5f;
-        public int maxAttempts = 20;
 
-        public static Vector3 GetRandomNavmeshPointNear(Transform referenceTransform)
+        public static Vector3 GetRandomNavmeshPointNear(Transform referenceTransform, float radius = 5f, int maxAttempts = 20)
         {
             var graph = AstarPath.active.data.recastGraph;
             NNConstraint constraint = NNConstraint.Walkable;
             constraint.graphMask = GraphMask.FromGraph(graph);
 
-            for (int i = 0; i < Instance.maxAttempts; i++)
+            for (int i = 0; i < maxAttempts; i++)
             {
-                Vector3 randomOffset = Random.insideUnitSphere * Instance.radius;
+                Vector3 randomOffset = Random.insideUnitSphere * radius;
                 randomOffset.y = 0; // Keep on ground plane
                 Vector3 samplePos = referenceTransform.position + randomOffset;
 

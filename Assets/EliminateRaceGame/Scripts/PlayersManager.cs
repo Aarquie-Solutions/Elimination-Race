@@ -1,16 +1,34 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AarquieSolutions.Base.Singleton;
 using UnityEngine;
+using ZombieElimination;
 
-public class PlayersManager : MonoBehaviour
+namespace ZombieElimination
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class PlayersManager : Singleton<PlayersManager>
     {
-        
-    }
+        public List<Player> players;
+        private static float updateInterval = 0.3f;
+        private float updateTimer = 0f;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private void Awake()
+        {
+            players = GetComponentsInChildren<Player>().ToList();
+        }
+
+        private void LateUpdate()
+        {
+            updateTimer += Time.deltaTime;
+            if (updateTimer < updateInterval) return;
+            updateTimer = 0f;
+            players = players.OrderByDescending(x => x.progressTracker.totalProgress).ToList();
+        }
+
+        public Player GetPlayerWithLowestProgress()
+        {
+            return players[^1];
+        }
     }
 }
