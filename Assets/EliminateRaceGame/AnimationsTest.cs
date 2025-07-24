@@ -175,7 +175,10 @@ public class AnimationsTest : MonoBehaviour
         yield return new WaitForSeconds(models[0].GetCurrentClip().length + 0.2f);
         for (int i = 0; i < models.Length; i++)
         {
-            models[i].ResetLocalPosition();
+            var mo = models[i];
+            //mo.ResetLocalPosition();
+
+            mo.animator.CrossFade("Zombie_Idle_Death", 0.1f);
         }
         animationType = AnimationType.None;
         coroutine = null;
