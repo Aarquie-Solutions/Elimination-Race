@@ -18,7 +18,11 @@ namespace ZombieElimination
         public float minSpeed = 2f;
         public float maxSpeed = 6f;
         public float preferredDistance = 10f;
+        public float maxDistance = 17f;
         public float distanceTolerance = 2f;
+
+        private AgentSpeedHandler speedHandler;
+
 
         void Awake()
         {
@@ -26,6 +30,11 @@ namespace ZombieElimination
             if (!transform.TryGetComponent<AIDestinationSetter>(out destinationSetter))
             {
                 destinationSetter = gameObject.AddComponent<AIDestinationSetter>();
+            }
+            speedHandler = GetComponent<AgentSpeedHandler>();
+            if (speedHandler != null)
+            {
+                speedHandler.isPlayer = false;
             }
         }
 
@@ -43,7 +52,7 @@ namespace ZombieElimination
 
             float currentDist = Vector3.Distance(transform.position, followTarget.position);
 
-            if (currentDist > preferredDistance + distanceTolerance)
+            if (currentDist > maxDistance + distanceTolerance)
             {
                 follower.maxSpeed = Mathf.Lerp(follower.maxSpeed, maxSpeed, Time.deltaTime * 2f);
             }

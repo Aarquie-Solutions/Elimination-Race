@@ -6,13 +6,6 @@ namespace ZombieElimination
 {
     public class Player : MonoBehaviour
     {
-        public float Speed
-        {
-            get => follower.maxSpeed;
-            private set => follower.maxSpeed = value;
-        }
-
-        public float targetSpeed;
 
         public List<Transform> waypoints;
         public float thresholdDistance = 6;
@@ -23,10 +16,22 @@ namespace ZombieElimination
         private Vector3 currentDestination;
         public WaypointProgressTracker progressTracker;
 
+
+        private AgentSpeedHandler speedHandler;
+
+        void Awake()
+        {
+            follower = GetComponent<FollowerEntity>();
+            speedHandler = GetComponent<AgentSpeedHandler>();
+            if (speedHandler != null)
+            {
+                speedHandler.isPlayer = true;
+            }
+        }
+
         void Start()
         {
             waypoints = PathManager.Instance.GetRoutePoints();
-            follower = GetComponent<FollowerEntity>();
             progressTracker = new WaypointProgressTracker(waypoints, transform);
             if (waypoints.Count > 0)
             {
