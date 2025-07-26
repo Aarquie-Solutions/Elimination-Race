@@ -28,6 +28,15 @@ namespace ZombieElimination
 
         public Player GetPlayerWithLowestProgress()
         {
+            for (int i = players.Count - 1; i >= 0; i--)
+            {
+                var player = players[i];
+                if (player.isEliminating)
+                {
+                    continue;
+                }
+                return player;
+            }
             return players[^1];
         }
     }

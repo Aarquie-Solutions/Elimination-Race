@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerSpeedRange: {x: 4, y: 6}
   zombieSpeedRange: {x: 4, y: 5}
+  playerSpeedChange: {x: 0.2, y: 0.5}
+  zombieSpeedChange: {x: 0.1, y: 0.4}
   winningScore: 10
   roundTimeLimit: 120
   enableElimination: 1
-  eliminationInterval: 15
+  eliminationInterval: 5

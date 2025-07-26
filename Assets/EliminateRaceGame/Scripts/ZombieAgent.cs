@@ -1,72 +1,120 @@
-using System.Collections.Generic;
 using Pathfinding;
-using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine;
 
 namespace ZombieElimination
 {
     public class ZombieAgent : MonoBehaviour
     {
-        private FollowerEntity follower;
-        private AIDestinationSetter destinationSetter;
+        public Transform FollowTarget { get; private set; }
 
-        public Vector3 currentDestination;
-        private Transform followTarget;
-
-        [Header("Speed Control")]
-        public float minSpeed = 2f;
-        public float maxSpeed = 6f;
+        [Header("Distance Settings")]
         public float preferredDistance = 10f;
         public float maxDistance = 17f;
         public float distanceTolerance = 2f;
 
         private AgentSpeedHandler speedHandler;
+        private AIDestinationSetter destinationSetter;
+        private FollowerEntity followerEntity;
 
+        private IZombieState currentState;
+
+        private NormalChaseState normalChaseState;
+        private EliminationState eliminationState;
+
+        public Player PlayerToEliminate => eliminationState.playerToEliminate;
+
+        private AnimatorPlayer animatorPlayer;
+
+
+        public Animator Animator => animatorPlayer.animator;
+
+        public AnimatorPlayer AnimatorPlayer => animatorPlayer;
+
+        public FollowerEntity FollowerEntity => followerEntity;
+
+        public AgentSpeedHandler SpeedHandler => speedHandler;
+
+        public bool IsEliminating => currentState is EliminationState;
 
         void Awake()
         {
-            follower = GetComponent<FollowerEntity>();
+            animatorPlayer = new AnimatorPlayer(GetComponentInChildren<Animator>().gameObject, false);
+            speedHandler = GetComponent<AgentSpeedHandler>();
+            if (speedHandler == null)
+                Debug.LogError($"{nameof(ZombieAgent)} requires {nameof(AgentSpeedHandler)} component.");
+
+            followerEntity = GetComponent<FollowerEntity>();
             if (!transform.TryGetComponent<AIDestinationSetter>(out destinationSetter))
             {
                 destinationSetter = gameObject.AddComponent<AIDestinationSetter>();
             }
-            speedHandler = GetComponent<AgentSpeedHandler>();
-            if (speedHandler != null)
-            {
-                speedHandler.isPlayer = false;
-            }
+
+            normalChaseState = new NormalChaseState();
+
+            float eliminationSpeed = speedHandler.maxSpeed * 1.2f;
+            eliminationState = new EliminationState(eliminationSpeed);
+
+            SetState(normalChaseState);
+        }
+
+        void Update()
+        {
+            currentState?.UpdateState(this);
+            if (!IsEliminating)
+                speedHandler.UpdateSpeed();
         }
 
         public void SetFollowTarget(Transform target)
         {
-            followTarget = target;
-            destinationSetter.target = followTarget;
+            FollowTarget = target;
+            destinationSetter.target = FollowTarget;
         }
 
-        private void Update()
+        public void SetState(IZombieState newState)
         {
-            if (followTarget == null) return;
+            if (currentState != null)
+                currentState.ExitState(this);
 
-            currentDestination = followTarget.position;
+            currentState = newState;
 
-            float currentDist = Vector3.Distance(transform.position, followTarget.position);
+            if (currentState != null)
+                currentState.EnterState(this);
+        }
 
-            if (currentDist > maxDistance + distanceTolerance)
-            {
-                follower.maxSpeed = Mathf.Lerp(follower.maxSpeed, maxSpeed, Time.deltaTime * 2f);
-            }
-            else if (currentDist < preferredDistance - distanceTolerance)
-            {
-                follower.maxSpeed = Mathf.Lerp(follower.maxSpeed, minSpeed, Time.deltaTime * 2f);
-            }
+        public void StartEliminationBehavior()
+        {
+            SetState(eliminationState);
+        }
+
+        public void StopFollower()
+        {
+            followerEntity.maxSpeed = 0;
+            followerEntity.rvoSettings.priority = 0;
+        }
+
+        public void StopEliminationBehavior()
+        {
+            SetState(normalChaseState);
         }
 
         void OnDrawGizmos()
         {
+            if (FollowTarget == null) return;
+
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(currentDestination, 0.5f);
-            Gizmos.DrawLine(transform.position + Vector3.up, currentDestination + Vector3.up);
+            Gizmos.DrawWireSphere(FollowTarget.position, 0.5f);
+            Gizmos.DrawLine(transform.position + Vector3.up, FollowTarget.position + Vector3.up);
+        }
+
+        public void SetFollowPosition(Vector3 position)
+        {
+            if (!IsEliminating)
+                FollowTarget.position = position;
+        }
+
+        public void Eliminate(Player currentLastPlayer)
+        {
+            eliminationState.playerToEliminate = currentLastPlayer;
         }
     }
 }

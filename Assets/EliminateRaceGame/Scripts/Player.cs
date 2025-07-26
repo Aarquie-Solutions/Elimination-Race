@@ -6,7 +6,6 @@ namespace ZombieElimination
 {
     public class Player : MonoBehaviour
     {
-
         public List<Transform> waypoints;
         public float thresholdDistance = 6;
 
@@ -18,11 +17,17 @@ namespace ZombieElimination
 
 
         private AgentSpeedHandler speedHandler;
+        public bool isEliminating;
+
+        private AnimatorPlayer animatorPlayer;
+
+        public AnimatorPlayer AnimatorPlayer => animatorPlayer;
 
         void Awake()
         {
             follower = GetComponent<FollowerEntity>();
             speedHandler = GetComponent<AgentSpeedHandler>();
+            animatorPlayer = new AnimatorPlayer(GetComponentInChildren<Animator>().gameObject, true);
             if (speedHandler != null)
             {
                 speedHandler.isPlayer = true;
@@ -48,6 +53,12 @@ namespace ZombieElimination
             {
                 AdvanceToNextWaypoint();
             }
+            
+            if (isEliminating)
+            {
+                return;
+            }
+            speedHandler.UpdateSpeed();
         }
 
         private void AdvanceToNextWaypoint()
@@ -64,6 +75,23 @@ namespace ZombieElimination
         {
             currentDestination = position;
             follower.destination = position;
+        }
+
+        public void StartElimination()
+        {
+            isEliminating = true;
+            follower.maxSpeed = speedHandler.minSpeed;
+        }
+
+        public void EliminationTrigger()
+        {
+            follower.maxSpeed = 0;
+            follower.enabled = false;
+        }
+
+        public Vector3 GetPlayerBehindOffsetPosition()
+        {
+            return transform.position - transform.forward;
         }
     }
 }
