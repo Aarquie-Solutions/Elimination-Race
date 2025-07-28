@@ -24,6 +24,8 @@ namespace ZombieElimination
 
         private void Start()
         {
+            ServiceLocator.zombieHordeController = this;
+
             zombieAgents = GetComponentsInChildren<ZombieAgent>().ToList();
 
             // currentTarget = new GameObject("ZombiesTarget").transform;
@@ -45,7 +47,7 @@ namespace ZombieElimination
             {
                 timer = 0f;
 
-                var lastPlayer = PlayersManager.Instance?.GetPlayerWithLowestProgress();
+                var lastPlayer = ServiceLocator.playersManager.GetPlayerWithLowestProgress();
                 if (lastPlayer == null)
                     return;
 
@@ -75,7 +77,7 @@ namespace ZombieElimination
             {
                 yield return new WaitForSeconds(gameRules.eliminationInterval);
 
-                currentLastPlayer = PlayersManager.Instance?.GetPlayerWithLowestProgress();
+                currentLastPlayer = ServiceLocator.playersManager.GetPlayerWithLowestProgress();
                 if (currentLastPlayer == null || zombieAgents.Count == 0)
                     continue;
 
@@ -89,7 +91,7 @@ namespace ZombieElimination
                 var eliminator = candidates[Random.Range(0, candidates.Count)];
 
                 $"Zombie {eliminator.name} is eliminating player {currentLastPlayer.name}".Log();
-                
+
                 // eliminator.SetFollowTarget(currentLastPlayer);
                 eliminator.Eliminate(currentLastPlayer);
                 eliminator.StartEliminationBehavior();

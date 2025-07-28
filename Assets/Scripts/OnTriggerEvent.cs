@@ -15,7 +15,7 @@ public class OnTriggerEvent : MonoBehaviour
     {
         var rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
-        rb.isKinematic = true;
+        rb.isKinematic = false;
         
         var col = GetComponent<Collider>();
         col.isTrigger = true;
