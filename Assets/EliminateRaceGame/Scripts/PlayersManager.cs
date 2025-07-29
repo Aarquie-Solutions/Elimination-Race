@@ -12,6 +12,7 @@ namespace ZombieElimination
     public class PlayersManager : MonoBehaviour
     {
         [SerializeField] private List<Player> players;
+        public int winnerIndex;
 
         public List<Player> Players
         {
@@ -89,7 +90,7 @@ namespace ZombieElimination
             centroid.y = 0;
             centroid.x = 0;
             grouperTrigger.transform.position = centroid;
-            // players = players.OrderByDescending(x => x.progressTracker.totalProgress).ToList();
+            players = players.OrderByDescending(x => x.transform.position.z).ToList();
         }
 
         public Player GetPlayerWithLowestProgress()
@@ -97,7 +98,7 @@ namespace ZombieElimination
             for (int i = players.Count - 1; i >= 0; i--)
             {
                 var player = players[i];
-                if (player.isEliminating)
+                if (player.isEliminating || player.isWinner)
                 {
                     continue;
                 }

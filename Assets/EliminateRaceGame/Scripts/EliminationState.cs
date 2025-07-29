@@ -100,6 +100,9 @@ namespace ZombieElimination
             yield return new WaitForSeconds(agent.AnimatorPlayer.GetCurrentClip().length + 0.1f);
 
             playerToEliminate.AnimatorPlayer.PlayDirectAnimation(AnimationHelper.Death);
+            
+            //Then again start running
+            agent.StopEliminationBehavior();
         }
     }
 }

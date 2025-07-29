@@ -5,7 +5,12 @@ namespace ZombieElimination
 {
     public class ServiceLocator : MonoBehaviour
     {
-        public static GameRulesSO gameRules;
+        public static GameRulesSO GameRules
+        {
+            get => Instance.gameRules;
+        }
+
+        public GameRulesSO gameRules;
         public static PlayersManager playersManager;
         public static PathManager pathManager;
         public static ZombieHordeController zombieHordeController;
@@ -17,7 +22,6 @@ namespace ZombieElimination
             if (Instance == null)
             {
                 Instance = this;
-                new EventManager();
                 // gameRules = Resources.Load<GameRulesSO>("GameRules");
                 // playersManager = GetComponent<PlayersManager>();
                 // pathManager = GetComponent<PathManager>();

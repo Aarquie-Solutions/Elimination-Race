@@ -8,7 +8,9 @@ namespace ZombieElimination
     public class SpeedRandomiser : MonoBehaviour
     {
         public float interval = 2f;
-        public GameRulesSO gameRules;
+
+        public GameRulesSO gameRules => ServiceLocator.GameRules;
+
         public bool isPlayer;
         public List<IAgentSpeedHandler> iAgents = new List<IAgentSpeedHandler>();
 

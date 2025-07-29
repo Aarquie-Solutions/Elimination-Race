@@ -4,14 +4,25 @@ namespace ZombieElimination
 {
     public class EventManager
     {
-        public static EventManager Instance { get; private set; }
+        public static EventManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new EventManager();
+                }
+                return instance;
+            }
+        }
+        private static EventManager instance;
 
         public event Action<Player> OnPlayerEliminated;
         public event Action<Block> OnBlockTriggered;
 
         public EventManager()
         {
-            Instance = this;
+            instance = this;
         }
 
         public void CallPlayerEliminated(Player player)

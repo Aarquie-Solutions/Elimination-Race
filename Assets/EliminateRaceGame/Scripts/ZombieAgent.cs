@@ -1,3 +1,4 @@
+using System;
 using Pathfinding;
 using UnityEngine;
 
@@ -50,10 +51,12 @@ namespace ZombieElimination
             }
 
             normalChaseState = new NormalChaseState();
+        }
 
+        private void Start()
+        {
             float eliminationSpeed = speedHandler.maxSpeed * 1.2f;
             eliminationState = new EliminationState(eliminationSpeed);
-
             SetState(normalChaseState);
         }
 

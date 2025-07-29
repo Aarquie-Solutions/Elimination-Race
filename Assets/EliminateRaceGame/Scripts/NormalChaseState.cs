@@ -11,6 +11,7 @@ namespace ZombieElimination
             {
                 agent.Animator.SetBool("IsEliminating", false);
             }
+            agent.FollowerEntity.maxSpeed = agent.SpeedHandler.maxSpeed;
             agent.FollowerEntity.rvoSettings.priority = 0.2f;
         }
 

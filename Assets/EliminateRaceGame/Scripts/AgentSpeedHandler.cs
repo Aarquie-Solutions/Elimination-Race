@@ -1,3 +1,4 @@
+using System;
 using Pathfinding; // For IAstarAI interface
 using UnityEngine;
 
@@ -9,8 +10,7 @@ namespace ZombieElimination
         private IAstarAI follower;
 
         [Header("Game Rules (Assign in Inspector)")]
-        [Tooltip("Central config for agent speed (min/max per type)")]
-        public GameRulesSO gameRules;
+        public GameRulesSO gameRules => ServiceLocator.GameRules;
 
         [Header("Role")]
         [Tooltip("Set true if this is a Player; false for Zombie/NPC")]
@@ -46,6 +46,10 @@ namespace ZombieElimination
         private void Awake()
         {
             follower = GetComponent<IAstarAI>();
+        }
+
+        private void Start()
+        {
             currentSpeed = minSpeed;
             targetSpeed = minSpeed;
         }
