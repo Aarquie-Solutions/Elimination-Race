@@ -6,6 +6,7 @@ using AarquieSolutions.Base.Singleton;
 using Unity.Cinemachine;
 using UnityEngine;
 using ZombieElimination;
+using System.Runtime.InteropServices;
 
 namespace ZombieElimination
 {
@@ -95,16 +96,7 @@ namespace ZombieElimination
 
         public Player GetPlayerWithLowestProgress()
         {
-            for (int i = players.Count - 1; i >= 0; i--)
-            {
-                var player = players[i];
-                if (player.isEliminating || player.isWinner)
-                {
-                    continue;
-                }
-                return player;
-            }
-            return players[^1];
+            return players.LastOrDefault(p => !p.isEliminating && !p.isWinner);
         }
 
         public static class TransformGrouper

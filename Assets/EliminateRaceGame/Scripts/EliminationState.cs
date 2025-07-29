@@ -19,7 +19,7 @@ namespace ZombieElimination
         public void EnterState(ZombieAgent agent)
         {
             this.agent = agent;
-            playerToEliminate.StartElimination();
+            // playerToEliminate.StartElimination();
 
             if (biteCoroutine != null)
             {
@@ -46,11 +46,11 @@ namespace ZombieElimination
 
             if (biteCoroutine == null)
             {
-                agent.FollowTarget.position = playerToEliminate.GetPlayerBehindOffsetPosition();
+                agent.FollowTarget.position = playerToEliminate.GetOffsetBehindPosition();
 
                 if (agent.FollowerEntity.enabled && agent.FollowerEntity.remainingDistance <= 1f)
                 {
-                    playerToEliminate.EliminationTrigger();
+                    playerToEliminate.Stop();
                 }
             }
 
@@ -80,7 +80,7 @@ namespace ZombieElimination
         {
             yield return null;
             agent.transform.LookAt(playerToEliminate.transform.position);
-            
+
             agent.AnimatorPlayer.PlayAnimationWithMode(AnimationHelper.biteAttemptFromBehind + AnimationHelper.Starting);
             playerToEliminate.AnimatorPlayer.PlayAnimationWithMode(AnimationHelper.biteAttemptFromBehind + AnimationHelper.Starting);
             yield return new WaitForSeconds(agent.AnimatorPlayer.GetCurrentClip().length + 0.1f);
@@ -100,7 +100,7 @@ namespace ZombieElimination
             yield return new WaitForSeconds(agent.AnimatorPlayer.GetCurrentClip().length + 0.1f);
 
             playerToEliminate.AnimatorPlayer.PlayDirectAnimation(AnimationHelper.Death);
-            
+
             //Then again start running
             agent.StopEliminationBehavior();
         }

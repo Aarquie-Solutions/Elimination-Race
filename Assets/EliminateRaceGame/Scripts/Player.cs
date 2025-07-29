@@ -1,70 +1,154 @@
-using System.Collections.Generic;
-using Pathfinding;
+using System;
+using System.Collections;
 using UnityEngine;
+using Pathfinding; // for FollowerEntity
 
 namespace ZombieElimination
 {
     public partial class Player : MonoBehaviour
     {
-        public float thresholdDistance = 6;
+        // Player state flags
         public bool isWinner;
+        public bool isEliminating = false;
 
         private FollowerEntity follower;
-
-
         private AgentSpeedHandler speedHandler;
-        public bool isEliminating;
-
         private AnimatorPlayer animatorPlayer;
 
         public AnimatorPlayer AnimatorPlayer => animatorPlayer;
 
-        void Awake()
+        private Coroutine moveCoroutine;
+
+        private void Awake()
         {
             follower = GetComponent<FollowerEntity>();
             speedHandler = GetComponent<AgentSpeedHandler>();
             animatorPlayer = new AnimatorPlayer(GetComponentInChildren<Animator>().gameObject, true);
             if (speedHandler != null)
-            {
                 speedHandler.isPlayer = true;
-            }
         }
 
-
-        void Update()
+        private void Update()
         {
-            if (follower == null)
-            {
+            if (follower == null || isEliminating)
                 return;
-            }
-            if (isEliminating)
-            {
-                return;
-            }
+
             speedHandler.UpdateSpeed();
         }
 
-
-        private void SetDestination(Vector3 position)
+        /// <summary>
+        /// Sets a destination for the pathfinder.
+        /// </summary>
+        public void SetDestination(Vector3 position)
         {
-            // currentDestination = position;
-            follower.destination = position;
+            if (follower != null)
+                follower.destination = position;
         }
 
+        /// <summary>
+        /// Move the player to a target position, then call onComplete callback.
+        /// Uses the pathfinding system (follower) for movement.
+        /// </summary>
+        public void MoveToPosition(Vector3 targetPosition, Action onComplete = null, float arrivalThreshold = 0.1f)
+        {
+            if (moveCoroutine != null)
+                StopCoroutine(moveCoroutine);
+
+            moveCoroutine = StartCoroutine(MoveToPositionCoroutine(targetPosition, onComplete, arrivalThreshold));
+        }
+
+        private IEnumerator MoveToPositionCoroutine(Vector3 target, Action onComplete, float threshold)
+        {
+            if (follower != null)
+                follower.enabled = true;
+
+            SetDestination(target);
+
+            // Wait until within threshold distance to target
+            while (Vector3.Distance(transform.position, target) > threshold)
+            {
+                yield return null;
+            }
+
+            onComplete?.Invoke();
+        }
+
+        /// <summary>
+        /// Jump to a destination following a parabolic arc.
+        /// Disables follower during jump and re-enables after landing.
+        /// </summary>
+        public void JumpTo(Vector3 destination, float jumpHeight, float jumpDuration, Action onComplete = null)
+        {
+            if (moveCoroutine != null)
+                StopCoroutine(moveCoroutine);
+
+            StartCoroutine(JumpArcCoroutine(transform.position, destination, jumpHeight, jumpDuration, onComplete));
+        }
+
+        private IEnumerator JumpArcCoroutine(Vector3 start, Vector3 end, float height, float duration, Action onComplete)
+        {
+            if (follower != null)
+                follower.enabled = false;
+
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                float t = elapsed / duration;
+                Vector3 pos = Vector3.Lerp(start, end, t);
+                pos.y += height * 4f * (t - t * t); // Parabola formula
+                transform.position = pos;
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            transform.position = end;
+
+            // Optionally: play landing animation or effects
+
+            if (follower != null && !isEliminating)
+                follower.enabled = true;
+
+            onComplete?.Invoke();
+        }
+
+        /// <summary>
+        /// Starts elimination state for player: stops movement and triggers elimination logic.
+        /// </summary>
         public void StartElimination()
         {
             isEliminating = true;
-            follower.maxSpeed = speedHandler.minSpeed;
+            if (follower != null)
+                follower.maxSpeed = speedHandler != null ? speedHandler.minSpeed : 0;
+
             EventManager.Instance.CallPlayerEliminated(this);
         }
 
-        public void EliminationTrigger()
+        /// <summary>
+        /// Stops all player movement immediately.
+        /// </summary>
+        public void Stop()
         {
-            follower.maxSpeed = 0;
-            follower.enabled = false;
+            if (follower != null)
+            {
+                follower.maxSpeed = 0;
+                follower.enabled = false;
+            }
         }
 
-        public Vector3 GetPlayerBehindOffsetPosition()
+        /// <summary>
+        /// Resumes normal player movement.
+        /// </summary>
+        public void ResumeNormalMovement()
+        {
+            isEliminating = false;
+            if (follower != null && speedHandler != null)
+            {
+                follower.maxSpeed = speedHandler.maxSpeed;
+                follower.enabled = true;
+            }
+        }
+
+        public Vector3 GetOffsetBehindPosition()
         {
             return transform.position - transform.forward;
         }

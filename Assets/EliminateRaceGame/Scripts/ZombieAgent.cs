@@ -115,9 +115,9 @@ namespace ZombieElimination
                 FollowTarget.position = position;
         }
 
-        public void Eliminate(Player currentLastPlayer)
+        public void Eliminate(Player targetPlayer)
         {
-            eliminationState.playerToEliminate = currentLastPlayer;
+            eliminationState.playerToEliminate = targetPlayer;
         }
     }
 }
