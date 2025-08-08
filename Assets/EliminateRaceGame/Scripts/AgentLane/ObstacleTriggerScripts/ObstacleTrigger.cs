@@ -14,14 +14,14 @@ namespace EliminateRaceGame
 
         protected virtual void Start()
         {
-            onTriggerStart.OnTrigger += OnTriggerStartActions;
-            onTriggerEnd.OnTrigger += OnTriggerEndActions;
+            onTriggerStart.OnTriggerEnterEvent += OnTriggerEnterEventStartActions;
+            onTriggerEnd.OnTriggerEnterEvent += OnTriggerEnterEventEndActions;
             Initialise();
         }
 
         protected abstract void Initialise();
 
-        protected virtual void OnTriggerStartActions(Collider other)
+        protected virtual void OnTriggerEnterEventStartActions(Collider other)
         {
             if (other.TryGetComponent(out AgentController_RVO agent))
             {
@@ -29,7 +29,7 @@ namespace EliminateRaceGame
             }
         }
 
-        protected virtual void OnTriggerEndActions(Collider other)
+        protected virtual void OnTriggerEnterEventEndActions(Collider other)
         {
             if (other.TryGetComponent(out AgentController_RVO agent))
             {

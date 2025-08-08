@@ -32,7 +32,7 @@ namespace EliminateRaceGame
         {
             EliminationTag = EliminationTag.FallingTree;
             RetrieveLanes();
-            onTreeHit.OnTrigger += TreeHit;
+            onTreeHit.OnTriggerEnterEvent += TreeHit;
             MaxAgentsToEliminate = 1;
         }
 

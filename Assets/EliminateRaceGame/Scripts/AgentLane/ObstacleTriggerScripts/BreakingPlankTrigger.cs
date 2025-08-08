@@ -41,11 +41,11 @@ namespace EliminateRaceGame
             
         }
 
-        protected override void OnTriggerStartActions(Collider other)
+        protected override void OnTriggerEnterEventStartActions(Collider other)
         {
         }
 
-        protected override void OnTriggerEndActions(Collider other)
+        protected override void OnTriggerEnterEventEndActions(Collider other)
         {
         }
 

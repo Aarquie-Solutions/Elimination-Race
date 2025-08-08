@@ -26,13 +26,13 @@ namespace EliminateRaceGame
 
         protected override void Initialise()
         {
-            onYetiSwipeTrigger.OnTrigger += YetiSwipeTriggerActions;
+            onYetiSwipeTrigger.OnTriggerEnterEvent += YetiSwipeTriggerEnterEventActions;
             EliminationTag = EliminationTag.YetiSwipe;
             MaxAgentsToEliminate = Random.Range(1, 3);
             SetSafeLanes();
         }
 
-        private void YetiSwipeTriggerActions(Collider obj)
+        private void YetiSwipeTriggerEnterEventActions(Collider obj)
         {
             if (obj.TryGetComponent(out AgentController_RVO agent))
             {

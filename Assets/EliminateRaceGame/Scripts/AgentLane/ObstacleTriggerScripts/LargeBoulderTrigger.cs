@@ -100,7 +100,7 @@ namespace EliminateRaceGame
 
             AdjustSpinSpeed();
 
-            boulderTrigger.OnTrigger += BoulderHit;
+            boulderTrigger.OnTriggerEnterEvent += BoulderHit;
             boulderPivot.gameObject.SetActive(false);
             EliminationTag = EliminationTag.LargeBoulder;
             MaxAgentsToEliminate = Random.Range(1, 4);
