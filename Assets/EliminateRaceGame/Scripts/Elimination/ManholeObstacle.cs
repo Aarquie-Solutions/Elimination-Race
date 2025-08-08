@@ -47,7 +47,7 @@ namespace ZombieElimination
                 player.MoveToPosition(approachPoint.position,
                     () =>
                         {
-                            player.JumpTo(jumpFailPoint.position,
+                            player.Jump(jumpFailPoint.position,
                                 jumpHeight: 1.8f,
                                 jumpDuration: 0.8f,
                                 onComplete: () =>

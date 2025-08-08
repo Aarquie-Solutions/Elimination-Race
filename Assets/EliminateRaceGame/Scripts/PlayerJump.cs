@@ -1,20 +1,27 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 namespace ZombieElimination
 {
-    public partial class Player
+    public partial class Player : IJump
     {
-        public void JumpTo(Vector3 destination, float jumpHeight, float jumpDuration)
+        public void Jump(Vector3 destination, float jumpHeight, float jumpDuration, Action onComplete = null)
         {
-            StartCoroutine(JumpArcCoroutine(transform.position, destination, jumpHeight, jumpDuration));
+            if (moveCoroutine != null)
+                StopCoroutine(moveCoroutine);
+
+            StartCoroutine(JumpArcCoroutine(transform.position, destination, jumpHeight, jumpDuration, onComplete));
         }
 
-        private IEnumerator JumpArcCoroutine(Vector3 start, Vector3 end, float height, float duration)
+        private IEnumerator JumpArcCoroutine(Vector3 start, Vector3 end, float height, float duration, Action onComplete = null)
         {
             if (follower != null)
                 follower.enabled = false;
 
+            //overriding duration
+            float distance = start.DistanceXZ(end);
+            duration = distance / speedHandler.CurrentSpeed;
             float elapsed = 0;
             while (elapsed < duration)
             {
@@ -33,6 +40,8 @@ namespace ZombieElimination
 
             if (follower != null)
                 follower.enabled = true;
+
+            onComplete?.Invoke();
         }
     }
 }

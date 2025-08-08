@@ -1,10 +1,11 @@
 using System;
+using System.Collections;
 using Pathfinding;
 using UnityEngine;
 
 namespace ZombieElimination
 {
-    public class ZombieAgent : MonoBehaviour
+    public class ZombieAgent : MonoBehaviour, IJump
     {
         public Transform FollowTarget { get; private set; }
 
@@ -15,7 +16,7 @@ namespace ZombieElimination
 
         private AgentSpeedHandler speedHandler;
         private AIDestinationSetter destinationSetter;
-        private FollowerEntity followerEntity;
+        private FollowerEntity follower;
 
         private IZombieState currentState;
 
@@ -31,7 +32,7 @@ namespace ZombieElimination
 
         public AnimatorPlayer AnimatorPlayer => animatorPlayer;
 
-        public FollowerEntity FollowerEntity => followerEntity;
+        public FollowerEntity Follower => follower;
 
         public AgentSpeedHandler SpeedHandler => speedHandler;
 
@@ -44,7 +45,7 @@ namespace ZombieElimination
             if (speedHandler == null)
                 Debug.LogError($"{nameof(ZombieAgent)} requires {nameof(AgentSpeedHandler)} component.");
 
-            followerEntity = GetComponent<FollowerEntity>();
+            follower = GetComponent<FollowerEntity>();
             if (!transform.TryGetComponent<AIDestinationSetter>(out destinationSetter))
             {
                 destinationSetter = gameObject.AddComponent<AIDestinationSetter>();
@@ -91,8 +92,8 @@ namespace ZombieElimination
 
         public void StopFollower()
         {
-            followerEntity.maxSpeed = 0;
-            followerEntity.rvoSettings.priority = 0;
+            follower.maxSpeed = 0;
+            follower.rvoSettings.priority = 0;
         }
 
         public void StopEliminationBehavior()
@@ -118,6 +119,42 @@ namespace ZombieElimination
         public void Eliminate(Player targetPlayer)
         {
             eliminationState.playerToEliminate = targetPlayer;
+        }
+
+        public void Jump(Vector3 destination, float jumpHeight, float jumpDuration, Action onComplete = null)
+        {
+            StartCoroutine(JumpArcCoroutine(transform.position, destination, jumpHeight, jumpDuration, onComplete));
+        }
+
+        private IEnumerator JumpArcCoroutine(Vector3 start, Vector3 end, float height, float duration, Action onComplete = null)
+        {
+            if (follower != null)
+                follower.enabled = false;
+
+            float elapsed = 0;
+            //overriding duration
+            float distance = start.DistanceXZ(end);
+            duration = distance / speedHandler.CurrentSpeed;
+            
+            while (elapsed < duration)
+            {
+                float t = elapsed / duration;
+                Vector3 pos = Vector3.Lerp(start, end, t);
+                pos.y += height * 4 * (t - t * t);
+
+                transform.position = pos;
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            transform.position = end;
+
+            // landing animation or fx
+
+            if (follower != null)
+                follower.enabled = true;
+
+            onComplete?.Invoke();
         }
     }
 }

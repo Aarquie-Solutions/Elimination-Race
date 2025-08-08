@@ -80,43 +80,6 @@ namespace ZombieElimination
             moveCoroutine = null;
         }
 
-        /// <summary>
-        /// Jump to a destination following a parabolic arc.
-        /// Disables follower during jump and re-enables after landing.
-        /// </summary>
-        public void JumpTo(Vector3 destination, float jumpHeight, float jumpDuration, Action onComplete = null)
-        {
-            if (moveCoroutine != null)
-                StopCoroutine(moveCoroutine);
-
-            StartCoroutine(JumpArcCoroutine(transform.position, destination, jumpHeight, jumpDuration, onComplete));
-        }
-
-        private IEnumerator JumpArcCoroutine(Vector3 start, Vector3 end, float height, float duration, Action onComplete)
-        {
-            if (follower != null)
-                follower.enabled = false;
-
-            float elapsed = 0f;
-            while (elapsed < duration)
-            {
-                float t = elapsed / duration;
-                Vector3 pos = Vector3.Lerp(start, end, t);
-                pos.y += height * 4f * (t - t * t); // Parabola formula
-                transform.position = pos;
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            transform.position = end;
-
-            // Optionally: play landing animation or effects
-
-            if (follower != null && !isEliminating)
-                follower.enabled = true;
-
-            onComplete?.Invoke();
-        }
 
         /// <summary>
         /// Starts elimination state for player: stops movement and triggers elimination logic.

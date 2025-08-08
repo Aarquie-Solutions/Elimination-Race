@@ -26,9 +26,9 @@ namespace ZombieElimination
                 agent.StopCoroutine(biteCoroutine);
             }
             biteCoroutine = null;
-            agent.FollowerEntity.maxSpeed = eliminationSpeed;
+            agent.Follower.maxSpeed = eliminationSpeed;
 
-            agent.FollowerEntity.rvoSettings.priority = 1;
+            agent.Follower.rvoSettings.priority = 1;
 
             if (agent.Animator != null)
             {
@@ -48,7 +48,7 @@ namespace ZombieElimination
             {
                 agent.FollowTarget.position = playerToEliminate.GetOffsetBehindPosition();
 
-                if (agent.FollowerEntity.enabled && agent.FollowerEntity.remainingDistance <= 1f)
+                if (agent.Follower.enabled && agent.Follower.remainingDistance <= 1f)
                 {
                     playerToEliminate.Stop();
                 }
