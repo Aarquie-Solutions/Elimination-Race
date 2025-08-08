@@ -176,6 +176,13 @@ public static class Utils
             return false;
         }
     }
+
+    public static float DistanceXZ(this Vector3 a, Vector3 b)
+    {
+        a.y = 0;
+        b.y = 0;
+        return Vector3.Distance(a, b);
+    }
 }
 
 public static class FastShuffler

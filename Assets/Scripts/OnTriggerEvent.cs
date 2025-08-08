@@ -4,7 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody),typeof(Collider))]
 public class OnTriggerEvent : MonoBehaviour
 {
-    public event Action<Collider> OnTrigger;
+    public event Action<Collider> OnTriggerEnterEvent;
+    public event Action<Collider> OnTriggerExitEvent;
 
     private void OnValidate()
     {
@@ -23,6 +24,10 @@ public class OnTriggerEvent : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        OnTrigger?.Invoke(other);
+        OnTriggerEnterEvent?.Invoke(other);
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        OnTriggerExitEvent?.Invoke(other);
     }
 }

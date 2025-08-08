@@ -12,20 +12,25 @@ namespace ZombieElimination
         public bool isEliminating = false;
 
         private FollowerEntity follower;
+        private AIDestinationSetter aiDestinationSetter;
         private AgentSpeedHandler speedHandler;
         private AnimatorPlayer animatorPlayer;
 
         public AnimatorPlayer AnimatorPlayer => animatorPlayer;
 
+        private Rigidbody rb;
         private Coroutine moveCoroutine;
 
         private void Awake()
         {
             follower = GetComponent<FollowerEntity>();
+            aiDestinationSetter = GetComponent<AIDestinationSetter>();
             speedHandler = GetComponent<AgentSpeedHandler>();
             animatorPlayer = new AnimatorPlayer(GetComponentInChildren<Animator>().gameObject, true);
             if (speedHandler != null)
                 speedHandler.isPlayer = true;
+            rb = GetComponent<Rigidbody>();
+            rb.isKinematic = true;
         }
 
         private void Update()
@@ -49,7 +54,7 @@ namespace ZombieElimination
         /// Move the player to a target position, then call onComplete callback.
         /// Uses the pathfinding system (follower) for movement.
         /// </summary>
-        public void MoveToPosition(Vector3 targetPosition, Action onComplete = null, float arrivalThreshold = 0.1f)
+        public void MoveToPosition(Vector3 targetPosition, Action onComplete = null, float arrivalThreshold = 0.2f)
         {
             if (moveCoroutine != null)
                 StopCoroutine(moveCoroutine);
@@ -61,16 +66,18 @@ namespace ZombieElimination
         {
             if (follower != null)
                 follower.enabled = true;
-
+            aiDestinationSetter.enabled = false;
             SetDestination(target);
 
             // Wait until within threshold distance to target
-            while (Vector3.Distance(transform.position, target) > threshold)
+            while (transform.position.DistanceXZ(target) > threshold)
             {
                 yield return null;
             }
 
             onComplete?.Invoke();
+            aiDestinationSetter.enabled = true;
+            moveCoroutine = null;
         }
 
         /// <summary>
@@ -123,6 +130,11 @@ namespace ZombieElimination
             EventManager.Instance.CallPlayerEliminated(this);
         }
 
+        public void Fall()
+        {
+            rb.isKinematic = false;
+        }
+
         /// <summary>
         /// Stops all player movement immediately.
         /// </summary>
@@ -132,6 +144,7 @@ namespace ZombieElimination
             {
                 follower.maxSpeed = 0;
                 follower.enabled = false;
+                aiDestinationSetter.enabled = false;
             }
         }
 

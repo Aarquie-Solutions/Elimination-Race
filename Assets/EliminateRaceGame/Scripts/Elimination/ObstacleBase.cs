@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -13,14 +14,29 @@ namespace ZombieElimination
 
         protected bool isTriggerActive = false;
 
-        // List of players currently inside the trigger
         protected readonly List<Player> playersInTrigger = new();
+
+        protected void OnValidate()
+        {
+            if (!TryGetComponent(out triggerZone))
+            {
+                triggerZone = GetComponentInChildren<OnTriggerEvent>();
+                if (triggerZone == null)
+                {
+                    triggerZone = GameObject.CreatePrimitive(PrimitiveType.Cube).AddComponent<OnTriggerEvent>();
+                    triggerZone.transform.parent = transform;
+                    triggerZone.transform.localPosition = Vector3.zero;
+                    triggerZone.name = "TriggerZone";
+                }
+            }
+        }
 
         protected virtual void Awake()
         {
             if (triggerZone != null)
             {
-                triggerZone.OnTrigger += OnTriggerHandler;
+                triggerZone.OnTriggerEnterEvent += OnTriggerEnterEventHandler;
+                triggerZone.OnTriggerExitEvent += OnTriggerExitEventHandler;
             }
             else
             {
@@ -28,28 +44,29 @@ namespace ZombieElimination
             }
         }
 
-        protected void OnTriggerHandler(Collider other)
+        protected void OnTriggerEnterEventHandler(Collider other)
         {
             if (other.TryGetComponent<Player>(out Player player))
             {
                 if (!playersInTrigger.Contains(player))
                 {
                     playersInTrigger.Add(player);
-                    $"{player.name} entered trigger zone".Log();
+                    //$"{player.name} entered trigger zone".Log();
                     OnPlayerEntered(player);
                 }
             }
         }
 
-        /// <summary>
-        /// Called when a Player enters the trigger zone.
-        /// Override to implement obstacle-specific logic.
-        /// </summary>
+        protected void OnTriggerExitEventHandler(Collider other)
+        {
+            if (other.TryGetComponent<Player>(out Player player))
+            {
+                OnPlayerExited(player);
+            }
+        }
+
         protected abstract void OnPlayerEntered(Player player);
 
-        /// <summary>
-        /// Optional: override for OnPlayerExited if needed.
-        /// </summary>
         protected virtual void OnPlayerExited(Player player)
         {
             playersInTrigger.Remove(player);

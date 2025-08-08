@@ -22,7 +22,7 @@ public class Block : MonoBehaviour
     private void OnEnable()
     {
         if (onTriggerEvent != null)
-            onTriggerEvent.OnTrigger += OnBlockTriggered;
+            onTriggerEvent.OnTriggerEnterEvent += OnBlockTriggered;
         endPoint = transform.Find("EndPoint");
         pivotPoint = transform.Find("PivotPoint");
     }
@@ -39,6 +39,6 @@ public class Block : MonoBehaviour
     private void OnDisable()
     {
         if (onTriggerEvent != null)
-            onTriggerEvent.OnTrigger -= OnBlockTriggered;
+            onTriggerEvent.OnTriggerEnterEvent -= OnBlockTriggered;
     }
 }

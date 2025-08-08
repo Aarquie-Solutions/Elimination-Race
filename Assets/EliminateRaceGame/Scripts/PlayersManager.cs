@@ -66,8 +66,8 @@ namespace ZombieElimination
         private void OnPlayerEliminated(Player obj)
         {
             Players.Remove(obj);
-            UpdatePlayerTransforms();
             UpdateGrouper();
+            UpdatePlayerTransforms();
         }
 
         private void UpdateGrouper()
@@ -80,18 +80,24 @@ namespace ZombieElimination
             //     target.Weight = 1f;
             //     grouperTrigger.Targets.Add(target);
             // }
-        }
 
-        private void LateUpdate()
-        {
-            updateTimer += Time.deltaTime;
-            if (updateTimer < updateInterval) return;
-            updateTimer = 0f;
             var centroid = TransformGrouper.CalculateCentroid(playerTransforms);
             centroid.y = 0;
             centroid.x = 0;
             grouperTrigger.transform.position = centroid;
             players = players.OrderByDescending(x => x.transform.position.z).ToList();
+        }
+
+
+        private void LateUpdate()
+        {
+            updateTimer += Time.deltaTime;
+            if (updateTimer < updateInterval)
+            {
+                return;
+            }
+            updateTimer = 0f;
+            UpdateGrouper();
         }
 
         public Player GetPlayerWithLowestProgress()
