@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -5,25 +6,52 @@ namespace ZombieElimination
 {
     public class TrolleyObstacle : ObstacleBase
     {
-        public Transform hitZone;
-        public Transform evadePoint;
+        public Transform hitPoint;
+        public TrolleyMover trolleyMover;
+        public OnTriggerEvent trolleyHitEvent;
+        public float timeToReach = 4f;
 
-        protected override void OnPlayerEntered(Player player)
+        protected override void Awake()
         {
-            if (ShouldBeHit(player))
+            base.Awake();
+            trolleyHitEvent.OnTriggerEnterEvent += OnTrolleyHit;
+        }
+
+        private void OnTrolleyHit(Collider obj)
+        {
+            if (obj.TryGetComponent(out Player player))
             {
-                player.MoveToPosition(hitZone.position, onComplete: player.StartElimination);
-            }
-            else
-            {
-                player.MoveToPosition(evadePoint.position, onComplete: player.ResumeNormalMovement);
+                StartCoroutine(PlayerHit(player));
+                
             }
         }
 
-        private bool ShouldBeHit(Player player)
+        private IEnumerator PlayerHit(Player player)
         {
-            // Example: Can use position, random, or other criteria
-            return Random.value < 0.4f;
+            $"Player {player.name} was hit by trolley".Log();
+            player.StartElimination();
+            player.Stop();
+            player.EnableRagdoll();
+            yield return new WaitForSecondsRealtime(1f);
+            player.Die();
+        }
+
+        protected override void OnPlayerEntered(Player player)
+        {
+            if (isTriggerActive)
+            {
+                return;
+            }
+            trolleyMover.MoveToInTime(hitPoint.position, timeToReach);
+            isTriggerActive = true;
+            // if (ShouldBeHit(player))
+            // {
+            //     player.MoveToPosition(hitZone.position, onComplete: player.StartElimination);
+            // }
+            // else
+            // {
+            //     player.MoveToPosition(evadePoint.position, onComplete: player.ResumeNormalMovement);
+            // }
         }
     }
 }

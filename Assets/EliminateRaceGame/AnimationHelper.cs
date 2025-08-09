@@ -173,7 +173,7 @@ public class AnimatorPlayer
         CurrentAnimationClip = FindClipByName(currentAnimationName);
         if (CurrentAnimationClip != null)
         {
-         //   Debug.Log($"Current clip: {CurrentAnimationClip.name}, Length: {CurrentAnimationClip.length}s");
+            //   Debug.Log($"Current clip: {CurrentAnimationClip.name}, Length: {CurrentAnimationClip.length}s");
         }
         return CurrentAnimationClip;
     }
@@ -202,5 +202,10 @@ public class AnimatorPlayer
     public void ResetLocalPosition()
     {
         model.transform.localPosition = Vector3.zero;
+    }
+
+    public void Die()
+    {
+        PlayDirectAnimation(AnimationHelper.Death);
     }
 }

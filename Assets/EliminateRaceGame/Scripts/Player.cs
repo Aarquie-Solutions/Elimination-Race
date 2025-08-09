@@ -21,6 +21,8 @@ namespace ZombieElimination
         private Rigidbody rb;
         private Coroutine moveCoroutine;
 
+        private RagdollBody ragdollBody;
+
         private void Awake()
         {
             follower = GetComponent<FollowerEntity>();
@@ -31,6 +33,8 @@ namespace ZombieElimination
                 speedHandler.isPlayer = true;
             rb = GetComponent<Rigidbody>();
             rb.isKinematic = true;
+
+            ragdollBody = GetComponentInChildren<RagdollBody>(true);
         }
 
         private void Update()
@@ -127,6 +131,17 @@ namespace ZombieElimination
         public Vector3 GetOffsetBehindPosition()
         {
             return transform.position - transform.forward;
+        }
+
+        public void Die()
+        {
+            animatorPlayer.Die();
+        }
+
+        public void EnableRagdoll()
+        {
+            animatorPlayer.animator.gameObject.SetActive(false);
+            ragdollBody.ApplyForce(Vector3.up);
         }
     }
 }

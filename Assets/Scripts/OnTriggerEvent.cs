@@ -16,7 +16,7 @@ public class OnTriggerEvent : MonoBehaviour
     {
         var rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
-        rb.isKinematic = false;
+        rb.isKinematic = true;
         
         var col = GetComponent<Collider>();
         col.isTrigger = true;
@@ -29,5 +29,14 @@ public class OnTriggerEvent : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         OnTriggerExitEvent?.Invoke(other);
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        OnTriggerEnterEvent?.Invoke(other.collider);
+    }
+    private void OnCollisionExit(Collision other)
+    {
+        OnTriggerExitEvent?.Invoke(other.collider);
     }
 }

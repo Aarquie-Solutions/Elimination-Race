@@ -13,6 +13,7 @@ namespace ZombieElimination
     public class PlayersManager : MonoBehaviour
     {
         [SerializeField] private List<Player> players;
+        [SerializeField] private CinemachineCamera camera;
         public int winnerIndex;
 
         public List<Player> Players
@@ -35,6 +36,7 @@ namespace ZombieElimination
             {
                 playerTransforms = players.Select(x => x.transform).ToList();
             }
+            camera.Target.TrackingTarget = playerTransforms[0];
         }
 
         private List<Transform> playerTransforms;

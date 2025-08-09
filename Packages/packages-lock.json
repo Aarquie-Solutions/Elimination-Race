@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "bz-soft.ragdoll-helper": {
+      "version": "file:bz-soft.ragdoll-helper",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.aarquiesolutions.automaticuianchoring": {
       "version": "https://github.com/Aarquie-Solutions/AutomaticUIAnchoring.git",
       "depth": 0,
