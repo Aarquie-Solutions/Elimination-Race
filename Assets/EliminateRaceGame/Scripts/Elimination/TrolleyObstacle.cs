@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
@@ -17,12 +18,16 @@ namespace ZombieElimination
             trolleyHitEvent.OnTriggerEnterEvent += OnTrolleyHit;
         }
 
+        private void Start()
+        {
+            trolleyMover.gameObject.SetActive(false);
+        }
+
         private void OnTrolleyHit(Collider obj)
         {
             if (obj.TryGetComponent(out Player player))
             {
                 StartCoroutine(PlayerHit(player));
-                
             }
         }
 
@@ -31,6 +36,7 @@ namespace ZombieElimination
             $"Player {player.name} was hit by trolley".Log();
             player.StartElimination();
             player.Stop();
+            yield return null;
             player.EnableRagdoll();
             yield return new WaitForSecondsRealtime(1f);
             player.Die();
@@ -42,6 +48,9 @@ namespace ZombieElimination
             {
                 return;
             }
+            trolleyMover.gameObject.SetActive(true);
+            
+            
             trolleyMover.MoveToInTime(hitPoint.position, timeToReach);
             isTriggerActive = true;
             // if (ShouldBeHit(player))
